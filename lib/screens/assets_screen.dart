@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import '../../models/asset.dart';
-import '../../widgets/asset_card.dart';
+import '../models/asset.dart';
+import '../widgets/asset_card.dart';
 
-class StaffAssetList extends StatefulWidget {
-  const StaffAssetList({super.key});
+class AssetsScreen extends StatefulWidget {
+  const AssetsScreen({super.key});
 
   @override
-  State<StaffAssetList> createState() => _StaffAssetListState();
+  State<AssetsScreen> createState() => _AssetsScreenState();
 }
 
-class _StaffAssetListState extends State<StaffAssetList> {
+class _AssetsScreenState extends State<AssetsScreen> {
   final List<Asset> assets = [
     Asset(id: 1, name: 'Fundamental\nElectrical', status: AssetStatus.available),
     Asset(id: 2, name: 'Artificial\nintelligence', status: AssetStatus.disable),
@@ -47,6 +47,7 @@ class _StaffAssetListState extends State<StaffAssetList> {
       ),
       body: Column(
         children: [
+          // Search bar
           Container(
             color: Colors.white,
             padding: const EdgeInsets.all(16),
@@ -73,13 +74,16 @@ class _StaffAssetListState extends State<StaffAssetList> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: IconButton(
                       icon: const Icon(Icons.filter_list, color: Colors.black54),
-                      onPressed: () {},
+                      onPressed: () {
+                        // Handle filter action
+                      },
                     ),
                   ),
                 ],
               ),
             ),
           ),
+          // Assets list
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
@@ -88,6 +92,7 @@ class _StaffAssetListState extends State<StaffAssetList> {
                 return AssetCard(
                   asset: assets[index],
                   onEdit: () {
+                    // Handle edit action
                     print('Edit asset ${assets[index].id}');
                   },
                 );
