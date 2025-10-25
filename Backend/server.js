@@ -13,6 +13,14 @@ import dashboardRoutes from "./routes/dashboard.js";
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// ✅ บังคับให้ response เป็น JSON เสมอ
+app.use((req, res, next) => {
+  res.header("Content-Type", "application/json");
+  next();
+});
+
 
 // สำหรับให้ Flutter / Web โหลดภาพได้
 const __filename = fileURLToPath(import.meta.url);
@@ -32,7 +40,7 @@ app.get("/", (req, res) => {
 });
 
 // Server configuration
-const PORT = 5000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+app.listen(5000, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port 5000`);
 });
+

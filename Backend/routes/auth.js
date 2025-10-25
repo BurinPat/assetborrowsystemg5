@@ -8,24 +8,30 @@ const SECRET_KEY = "mfu_asset_secret";
 
 // REGISTER
 router.post("/register", async (req, res) => {
-  console.log("Incoming body:", req.body);  // ✅ เพิ่มบรรทัดนี้
+  console.log("Incoming body:", req.body);  
   const { full_name, username, password, role } = req.body;
-  if (!full_name ||!username || !password || !role)
+
+  if (!full_name || !username || !password || !role)
     return res.status(400).json({ message: "Missing fields" });
 
   const hashedPassword = await bcrypt.hash(password, 10);
   const sql = "INSERT INTO users (full_name, username, password, role) VALUES (?, ?, ?, ?)";
-  db.query(sql, [username, hashedPassword, role], (err) => {
-    if (err) return res.status(500).json({ message: "Database error" });
+
+  db.query(sql, [full_name, username, hashedPassword, role], (err) => {
+    if (err) {
+      console.error("❌ Database error:", err);
+      return res.status(500).json({ message: "Database error", error: err.message });
+    }
     res.status(201).json({ message: "User registered successfully" });
   });
 });
 
 // LOGIN
 router.post("/login", (req, res) => {
+  console.log("✅ Login request received:", req.body);
   const { username, password } = req.body;
-
   const sql = "SELECT * FROM users WHERE username = ?";
+
   db.query(sql, [username], async (err, results) => {
     if (err) return res.status(500).json({ message: "Database error" });
     if (results.length === 0)
