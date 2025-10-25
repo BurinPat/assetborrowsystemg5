@@ -13,7 +13,7 @@ router.post("/register", async (req, res) => {
     return res.status(400).json({ message: "Missing fields" });
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const sql = "INSERT INTO users (username, password, role) VALUES (?, ?, ?)";
+  const sql = "INSERT INTO users (full_name, username, password, role) VALUES (?, ?, ?, ?)";
   db.query(sql, [username, hashedPassword, role], (err) => {
     if (err) return res.status(500).json({ message: "Database error" });
     res.status(201).json({ message: "User registered successfully" });
