@@ -8,8 +8,9 @@ const SECRET_KEY = "mfu_asset_secret";
 
 // REGISTER
 router.post("/register", async (req, res) => {
-  const { username, password, role } = req.body;
-  if (!username || !password || !role)
+  console.log("Incoming body:", req.body);  // ✅ เพิ่มบรรทัดนี้
+  const { full_name, username, password, role } = req.body;
+  if (!full_name ||!username || !password || !role)
     return res.status(400).json({ message: "Missing fields" });
 
   const hashedPassword = await bcrypt.hash(password, 10);
