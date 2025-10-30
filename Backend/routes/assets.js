@@ -1,9 +1,9 @@
 import express from "express";
 import multer from "multer";
 import path from "path";
-import db from "../db.js";
+import db from "../db.js";  // ตรวจสอบให้แน่ใจว่า db.js อยู่ในที่ที่ถูกต้อง
 import fs from "fs";
-import { verifyToken, authorizeRole } from "./verifyToken.js";
+import { verifyToken, authorizeRole } from "./verifyToken.js";  // ตรวจสอบว่า verifyToken และ authorizeRole ทำงานถูกต้อง
 
 const router = express.Router();
 
@@ -84,7 +84,6 @@ router.post(
     });
   }
 );
-
 
 // แก้ไขครุภัณฑ์ (เฉพาะ Staff)
 router.put(

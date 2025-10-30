@@ -42,7 +42,7 @@ extension AssetStatusExtension on AssetStatus {
       case AssetStatus.pending:
         return const Color(0xFFFBBF24);
       case AssetStatus.borrowed:
-        return const Color(0xFF22C55E);
+        return const Color(0xFF3B82F6);
     }
   }
 }

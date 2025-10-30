@@ -1,7 +1,53 @@
 import 'package:flutter/material.dart';
+import '../../widgets/profile_menu.dart';
 
-class StudentHistory extends StatelessWidget {
-  const StudentHistory({super.key});
+class StudentHistory extends StatefulWidget {
+  final String fullName;
+  const StudentHistory({super.key, required this.fullName});
+
+  @override
+  State<StudentHistory> createState() => _StudentHistoryState();
+}
+
+class _StudentHistoryState extends State<StudentHistory> {
+  final List<Map<String, dynamic>> historyData = [
+    {
+      'name': 'Camera',
+      'borrowDate': '18/10/25',
+      'returnDate': '19/10/25',
+      'approvedBy': 'Mr. Robert Downey',
+      'gotBackBy': 'Admin A',
+      'status': 'Returned',
+      'color': Colors.grey,
+      'textColor': Colors.white,
+    },
+    {
+      'name': 'Microphone',
+      'borrowDate': '19/10/25',
+      'returnDate': '20/10/25',
+      'approvedBy': 'Mr. Stark',
+      'status': 'Borrowed',
+      'color': Colors.blue,
+      'textColor': Colors.white,
+    },
+    {
+      'name': 'Tripod',
+      'borrowDate': '19/10/25',
+      'returnDate': '29/10/25',
+      'status': 'Pending',
+      'color': Colors.amber.shade300,
+      'textColor': Colors.white,
+    },
+    {
+      'name': 'Projector',
+      'borrowDate': '-',
+      'returnDate': '-',
+      'rejectedBy': 'Mr. Admin',
+      'status': 'Rejected',
+      'color': Colors.red.shade300,
+      'textColor': Colors.white,
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -10,12 +56,22 @@ class StudentHistory extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
+        centerTitle: true,
+        leading: Builder(
+          builder: (context) {
+            return IconButton(
+              icon: const Icon(Icons.account_circle, color: Colors.black, size: 32),
+              onPressed: () async {
+                final RenderBox button = context.findRenderObject() as RenderBox;
+                final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+                final Offset position = button.localToGlobal(Offset.zero, ancestor: overlay);
+                await ProfileMenu.show(context, position, fullName: widget.fullName);
+              },
+            );
+          },
         ),
         title: const Text(
-          'My History',
+          'Borrow History',
           style: TextStyle(
             color: Colors.black,
             fontSize: 24,
@@ -23,65 +79,68 @@ class StudentHistory extends StatelessWidget {
           ),
         ),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: 3,
-        itemBuilder: (context, index) {
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+      body: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: ListView(
+          children: [
+            const SizedBox(height: 16),
+            ...historyData.map((item) => HistoryCard(item: item)).toList(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class HistoryCard extends StatelessWidget {
+  final Map<String, dynamic> item;
+  const HistoryCard({super.key, required this.item});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 12),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 0.5,
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Stack(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 4, right: 80),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Name: ${item['name']}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Text('Borrow date: ${item['borrowDate']}'),
+                  Text('Return date: ${item['returnDate']}'),
+                  if (item.containsKey('approvedBy')) Text('Approved by: ${item['approvedBy']}'),
+                  if (item.containsKey('gotBackBy')) Text('Got back by: ${item['gotBackBy']}'),
+                  if (item.containsKey('rejectedBy')) Text('Rejected by: ${item['rejectedBy']}'),
+                ],
+              ),
             ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF3B82F6).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.inventory_2,
-                    color: Color(0xFF3B82F6),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: item['color'],
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  item['status'],
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: item['textColor'],
                   ),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Borrowed Asset ${index + 1}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Returned ${index + 1} weeks ago',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.chevron_right, color: Colors.grey),
-              ],
+              ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }

@@ -1,99 +1,51 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../../models/asset.dart';
-import '../../widgets/asset_card.dart';
+import '../../widgets/profile_menu.dart';
+import '../../widgets/borrow_asset_dialog.dart'; // ✅ เพิ่มไฟล์ BorrowAssetDialog
 
 class StudentAssetList extends StatefulWidget {
-  const StudentAssetList({super.key});
+  final String fullName;
+  const StudentAssetList({super.key, required this.fullName});
 
   @override
   State<StudentAssetList> createState() => _StudentAssetListState();
 }
 
 class _StudentAssetListState extends State<StudentAssetList> {
-  final List<Asset> assets = [
-    Asset(id: 1, name: 'Fundamental\nElectrical', status: AssetStatus.available),
-    Asset(id: 2, name: 'Artificial\nIntelligence', status: AssetStatus.disable),
-    Asset(id: 3, name: 'Internet of Things', status: AssetStatus.pending),
-    Asset(id: 4, name: 'Book', status: AssetStatus.borrowed),
+  final List<Map<String, dynamic>> assets = [
+    {
+      'id': 1,
+      'name': 'Camera',
+      'status': AssetStatus.available,
+      'image':
+          'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400',
+      'description': 'High quality DSLR camera for events.',
+    },
+    {
+      'id': 2,
+      'name': 'Microphone',
+      'status': AssetStatus.available,
+      'image':
+          'https://images.unsplash.com/photo-1587815070923-216f7b1e3b87?w=400',
+      'description': 'Currently under maintenance.',
+    },
+    {
+      'id': 3,
+      'name': 'Tripod',
+      'status': AssetStatus.pending,
+      'image':
+          'https://images.unsplash.com/photo-1519710164239-da123dc03ef4?w=400',
+      'description': 'Pending approval for usage.',
+    },
+    {
+      'id': 4,
+      'name': 'Projector',
+      'status': AssetStatus.available,
+      'image':
+          'https://images.unsplash.com/photo-1587825140708-6ce5274f0a69?w=400',
+      'description': 'Currently borrowed by another student.',
+    },
   ];
-
-  DateTime? borrowDate;
-  DateTime? returnDate;
-
-  // ฟังก์ชันเลือกวัน
-  Future<void> _pickDate(BuildContext context, bool isBorrowDate) async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2100),
-    );
-    if (picked != null) {
-      setState(() {
-        if (isBorrowDate) {
-          borrowDate = picked;
-        } else {
-          returnDate = picked;
-        }
-      });
-    }
-  }
-
-  // ฟังก์ชัน Request
-  void _showRequestDialog(String assetName) {
-    borrowDate = null;
-    returnDate = null;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Request "$assetName"'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextButton(
-              onPressed: () => _pickDate(context, true),
-              child: Text(borrowDate == null
-                  ? 'Select Borrow Date'
-                  : 'Borrow: ${DateFormat('yyyy-MM-dd').format(borrowDate!)}'),
-            ),
-            TextButton(
-              onPressed: () => _pickDate(context, false),
-              child: Text(returnDate == null
-                  ? 'Select Return Date'
-                  : 'Return: ${DateFormat('yyyy-MM-dd').format(returnDate!)}'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (borrowDate == null || returnDate == null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Please select both dates')),
-                );
-                return;
-              }
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Requested "$assetName"\nBorrow: ${DateFormat('yyyy-MM-dd').format(borrowDate!)}\nReturn: ${DateFormat('yyyy-MM-dd').format(returnDate!)}',
-                  ),
-                ),
-              );
-              Navigator.pop(context);
-            },
-            child: const Text('Confirm'),
-          ),
-        ],
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -102,28 +54,39 @@ class _StudentAssetListState extends State<StudentAssetList> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
+        centerTitle: true,
+        leading: Builder(
+          builder: (context) {
+            return IconButton(
+              icon:
+                  const Icon(Icons.account_circle, color: Colors.black, size: 32),
+              onPressed: () async {
+                final RenderBox button = context.findRenderObject() as RenderBox;
+                final RenderBox overlay =
+                    Overlay.of(context).context.findRenderObject() as RenderBox;
+                final Offset position =
+                    button.localToGlobal(Offset.zero, ancestor: overlay);
+
+                await ProfileMenu.show(context, position,
+                    fullName: widget.fullName);
+              },
+            );
+          },
         ),
         title: const Text(
-          'Assets',
+          'Assets List',
           style: TextStyle(
             color: Colors.black,
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add, color: Colors.black, size: 28),
-            onPressed: () {},
-          ),
-        ],
       ),
+
+      // 🧾 เนื้อหา
       body: Column(
         children: [
-          // Search bar
+          // 🔍 Search bar
           Container(
             color: Colors.white,
             padding: const EdgeInsets.all(16),
@@ -142,14 +105,15 @@ class _StudentAssetListState extends State<StudentAssetList> {
                     child: TextField(
                       decoration: InputDecoration(
                         border: InputBorder.none,
-                        hintText: 'Search asset...',
+                        hintText: 'Search assets...',
                       ),
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: IconButton(
-                      icon: const Icon(Icons.filter_list, color: Colors.black54),
+                      icon:
+                          const Icon(Icons.filter_list, color: Colors.black54),
                       onPressed: () {},
                     ),
                   ),
@@ -158,22 +122,124 @@ class _StudentAssetListState extends State<StudentAssetList> {
             ),
           ),
 
-          // Asset List
+          // 🧱 Asset List (กดได้ทั้งกล่อง)
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: assets.length,
               itemBuilder: (context, index) {
                 final asset = assets[index];
-                return AssetCard(
-                  asset: asset,
-                  onEdit: () {
-                    // แก้ไข หรือดูรายละเอียด
-                    print('View asset ${asset.id}');
+
+                return InkWell(
+                  borderRadius: BorderRadius.circular(16),
+                  onTap: () {
+                    if (asset['status'] == AssetStatus.available) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => BorrowAssetDialog(
+                          asset: asset,
+                          onConfirm: (newRequest) {
+                            setState(() {
+                              assets[index] = newRequest;
+                            });
+                          },
+                        ),
+                      );
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                              '${asset['name']} is not available for borrowing.'),
+                          backgroundColor: Colors.grey[700],
+                        ),
+                      );
+                    }
                   },
-                  onRequest: asset.status == AssetStatus.available
-                      ? () => _showRequestDialog(asset.name)
-                      : null,
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // 🖼️ รูปภาพ
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(
+                            asset['image'] ?? '',
+                            width: 60,
+                            height: 60,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                width: 60,
+                                height: 60,
+                                color: Colors.grey[300],
+                                child: const Icon(Icons.camera_alt,
+                                    color: Colors.grey),
+                              );
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+
+                        // 📄 รายละเอียด
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                asset['name'] ?? 'Unknown',
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                asset['description'] ??
+                                    'No description available.',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // 🏷️ Status
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: (asset['status'] as AssetStatus).color,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            (asset['status'] as AssetStatus).label,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 );
               },
             ),

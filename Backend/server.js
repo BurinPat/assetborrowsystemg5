@@ -5,11 +5,11 @@ import { fileURLToPath } from "url";
 import fs from "fs";
 
 // import routes
-import authRoutes from "./routes/auth.js";
-import assetRoutes from "./routes/assets.js";
-import borrowRoutes from "./routes/borrow.js";
-import historyRoutes from "./routes/history.js";
-import dashboardRoutes from "./routes/dashboard.js";
+import authRoutes from "./routes/auth.js";  // ต้อง import ไฟล์ auth.js
+import assetRoutes from "./routes/assets.js"; // ต้อง import ไฟล์ assets.js
+import borrowRoutes from "./routes/borrow.js";  // ต้อง import ไฟล์ borrow.js
+import historyRoutes from "./routes/history.js";  // ต้อง import ไฟล์ history.js
+import dashboardRoutes from "./routes/dashboard.js";  // ต้อง import ไฟล์ dashboard.js
 
 const uploadDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadDir)) {
@@ -27,7 +27,6 @@ app.use((req, res, next) => {
   res.header("Content-Type", "application/json");
   next();
 });
-
 
 // สำหรับให้ Flutter / Web โหลดภาพได้
 const __filename = fileURLToPath(import.meta.url);
@@ -50,4 +49,3 @@ app.get("/", (req, res) => {
 app.listen(5000, "0.0.0.0", () => {
   console.log(`🚀 Server running on port 5000`);
 });
-

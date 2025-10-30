@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 import 'lecturer_asset_list.dart';
-import 'lecturer_dashboard.dart';
+import '../../shared/dashboard.dart'; // ✅ ใช้ Dashboard ตัวเดียวกับ Staff
 import 'lecturer_history.dart';
+import 'lecturer_return_asset.dart'; // ✅ เพิ่มถ้ามีหน้า Return
 
 class LecturerMain extends StatefulWidget {
-  const LecturerMain({super.key});
+  final String fullName; // ✅ รับชื่อจริงจาก Login
+  final String role;     // ✅ รับ role จาก Login
+
+  const LecturerMain({
+    super.key,
+    required this.fullName,
+    required this.role,
+  });
 
   @override
   State<LecturerMain> createState() => _LecturerMainState();
@@ -13,16 +21,18 @@ class LecturerMain extends StatefulWidget {
 class _LecturerMainState extends State<LecturerMain> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
-    const LecturerAssetList(),
-    const LecturerDashboard(),
-    const LecturerHistory(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    // ✅ ส่งชื่อและ role ให้ Dashboard (shared)
+    final List<Widget> pages = [
+      const LecturerAssetList(),
+      Dashboard(fullName: widget.fullName, role: widget.role),
+      const LecturerHistory(),
+      //const LecturerReturnAsset(), // ✅ ถ้ามีหน้า return
+    ];
+
     return Scaffold(
-      body: _pages[_currentIndex],
+      body: pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
@@ -31,6 +41,7 @@ class _LecturerMainState extends State<LecturerMain> {
           });
         },
         selectedItemColor: Colors.blue[700],
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.inventory_2),
@@ -43,6 +54,10 @@ class _LecturerMainState extends State<LecturerMain> {
           BottomNavigationBarItem(
             icon: Icon(Icons.history),
             label: 'History',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.front_hand),
+            label: 'Request',
           ),
         ],
       ),

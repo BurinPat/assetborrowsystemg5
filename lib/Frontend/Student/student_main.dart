@@ -3,8 +3,16 @@ import 'student_asset_list.dart';
 import 'student_history.dart';
 import 'student_request_page.dart';
 
+
 class StudentMain extends StatefulWidget {
-  const StudentMain({super.key});
+  final String fullName; // ✅ เพิ่มรับชื่อจริงจาก Login
+  final String role;     // ✅ เพิ่มรับ role จาก Login
+
+  const StudentMain({
+    super.key,
+    required this.fullName,
+    required this.role,
+  });
 
   @override
   State<StudentMain> createState() => _StudentMainState();
@@ -13,16 +21,16 @@ class StudentMain extends StatefulWidget {
 class _StudentMainState extends State<StudentMain> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [
-    const StudentAssetList(),
-    const StudentHistory(),
-    const StudentRequestPage(),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    // ✅ ส่งชื่อและ role ให้ Dashboard
+    final List<Widget> pages = [
+      StudentAssetList(fullName: widget.fullName),
+      StudentHistory(fullName: widget.fullName),
+    ];
+
     return Scaffold(
-      body: _pages[_currentIndex],
+      body: pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) {
@@ -31,6 +39,7 @@ class _StudentMainState extends State<StudentMain> {
           });
         },
         selectedItemColor: Colors.amber[700],
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.inventory_2),

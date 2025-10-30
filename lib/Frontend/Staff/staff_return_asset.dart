@@ -1,20 +1,49 @@
 import 'package:flutter/material.dart';
+import '../../widgets/profile_menu.dart';
 
 class StaffReturnAsset extends StatefulWidget {
-  const StaffReturnAsset({super.key});
+  final String fullName; // ✅ รับชื่อผู้ใช้จาก parent
+  const StaffReturnAsset({super.key, required this.fullName});
 
   @override
   State<StaffReturnAsset> createState() => _StaffReturnAssetState();
 }
 
 class _StaffReturnAssetState extends State<StaffReturnAsset> {
-  final _formKey = GlobalKey<FormState>();
-  String? selectedAsset;
-  final List<String> assets = [
-    'Fundamental Electrical',
-    'Artificial intelligence',
-    'Internet of thing',
-    'Book',
+  final List<Map<String, dynamic>> borrowedItems = [
+    {
+      'id': 1,
+      'itemName': 'Camera',
+      'borrowDate': '18/10/25',
+      'returnDate': '20/10/25',
+      'borrowedBy': 'Robert Downey',
+      'approvedBy': 'MA Asset',
+      'status': 'Borrowed',
+      'color': Colors.blue,
+      'textColor': Colors.white,
+    },
+    {
+      'id': 2,
+      'itemName': 'Microphone',
+      'borrowDate': '19/10/25',
+      'returnDate': '21/10/25',
+      'borrowedBy': 'Tony Stark',
+      'approvedBy': 'Mr.Admin',
+      'status': 'Borrowed',
+      'color': Colors.blue,
+      'textColor': Colors.white,
+    },
+    {
+      'id': 3,
+      'itemName': 'Tripod',
+      'borrowDate': '20/10/25',
+      'returnDate': '23/10/25',
+      'borrowedBy': 'Bruce Wayne',
+      'approvedBy': 'Mr.Admin',
+      'status': 'Borrowed',
+      'color': Colors.blue,
+      'textColor': Colors.white,
+    },
   ];
 
   @override
@@ -24,9 +53,19 @@ class _StaffReturnAssetState extends State<StaffReturnAsset> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.of(context).pop(),
+        centerTitle: true,
+        leading: Builder(
+          builder: (context) {
+            return IconButton(
+              icon: const Icon(Icons.account_circle, color: Colors.black, size: 32),
+              onPressed: () async {
+                final RenderBox button = context.findRenderObject() as RenderBox;
+                final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
+                final Offset position = button.localToGlobal(Offset.zero, ancestor: overlay);
+                await ProfileMenu.show(context, position, fullName: widget.fullName);
+              },
+            );
+          },
         ),
         title: const Text(
           'Return Asset',
@@ -37,118 +76,87 @@ class _StaffReturnAssetState extends State<StaffReturnAsset> {
           ),
         ),
       ),
-      body: SingleChildScrollView(
+      body: ListView.builder(
         padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+        itemCount: borrowedItems.length,
+        itemBuilder: (context, index) {
+          final item = borrowedItems[index];
+          return Container(
+            margin: const EdgeInsets.only(bottom: 16),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 2),
                 ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ชื่อ + Status
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Select Asset',
-                      style: TextStyle(
+                    Text(
+                      'Name: ${item['itemName']}',
+                      style: const TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
-                      value: selectedAsset,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
-                        ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: item['color'],
+                        borderRadius: BorderRadius.circular(6),
                       ),
-                      hint: const Text('Choose an asset'),
-                      items: assets.map((String asset) {
-                        return DropdownMenuItem<String>(
-                          value: asset,
-                          child: Text(asset),
-                        );
-                      }).toList(),
-                      onChanged: (String? value) {
-                        setState(() {
-                          selectedAsset = value;
-                        });
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      'Condition',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextFormField(
-                      maxLines: 4,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        hintText: 'Describe the condition of the asset',
-                        contentPadding: const EdgeInsets.all(16),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Asset returned successfully'),
-                              ),
-                            );
-                            Navigator.pop(context);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF3B82F6),
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          'Submit Return',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                      child: Text(
+                        item['status'],
+                        style: TextStyle(
+                          color: item['textColor'],
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-        ),
+                const SizedBox(height: 8),
+                Text('Borrow date: ${item['borrowDate']}', style: TextStyle(color: Colors.grey[700])),
+                Text('Return date: ${item['returnDate']}', style: TextStyle(color: Colors.grey[700])),
+                Text('Borrowed by: ${item['borrowedBy']}', style: TextStyle(color: Colors.grey[700])),
+                Text('Approved by: ${item['approvedBy']}', style: TextStyle(color: Colors.grey[700])),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${item['itemName']} returned successfully'),
+                          backgroundColor: const Color(0xFF22C55E),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF22C55E),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                      elevation: 0,
+                    ),
+                    child: const Text('Return', style: TextStyle(fontWeight: FontWeight.w600)),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
