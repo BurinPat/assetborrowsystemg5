@@ -4,6 +4,8 @@ import '../services/auth_service.dart'; // ✅ ใช้ AuthService เดิ�
 import 'register_page.dart'; // ✅ หน้า Register
 import '../Frontend/Staff/staff_main.dart'; // ✅ ใช้ร่วมกับ Lecturer
 import '../Frontend/Student/student_main.dart'; // ✅ หน้านักศึกษา
+import '../Frontend/Lecturer/lecturer_main.dart';
+
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -134,12 +136,20 @@ class LoginPage extends StatelessWidget {
                           final role =
                               data['role']?.toString().toUpperCase() ?? '';
 
-                          if (role == 'LECTURER' || role == 'STAFF') {
+                          if (role == 'STAFF') {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                 builder: (_) =>
                                     StaffMain(fullName: fullName, role: role),
+                              ),
+                            );
+                            } else if (role == 'LECTURER') {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    LecturerMain(fullName: fullName, role: role),
                               ),
                             );
                           } else if (role == 'STUDENT') {
