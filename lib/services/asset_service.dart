@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import '../models/asset.dart';  // นำเข้าโมเดล Asset
 
 class AssetService {
   static const String _baseUrl = 'http://localhost:5000/api';  // URL ของ API
