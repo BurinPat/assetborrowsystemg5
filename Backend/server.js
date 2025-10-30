@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
+import fs from "fs";
 
 // import routes
 import authRoutes from "./routes/auth.js";
@@ -9,6 +10,12 @@ import assetRoutes from "./routes/assets.js";
 import borrowRoutes from "./routes/borrow.js";
 import historyRoutes from "./routes/history.js";
 import dashboardRoutes from "./routes/dashboard.js";
+
+const uploadDir = path.join(process.cwd(), "uploads");
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+  console.log("📁 Created uploads directory automatically");
+}
 
 const app = express();
 app.use(cors());
